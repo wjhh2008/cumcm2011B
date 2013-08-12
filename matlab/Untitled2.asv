@@ -5,39 +5,34 @@ p=xlsread(file,1,'A2:E583');
 e=xlsread(file,2,'A2:B929');
 entryA=xlsread(file,4,'C2:C14');
 
-n=582;
 limit=30;
+figure(1)
 %plot graph
-A=zeros(n);
-xy=zeros(n,2);
-for i=1:size(e,1)
+A=zeros(92);
+xy=zeros(92,2);
+for i=1:143
     x=e(i,1);
     y=e(i,2);
-    A(x,y)=1;
-    A(y,x)=1;
+    if (x<=92 && y<=92)
+        A(x,y)=1;
+        A(y,x)=1;
+    end
 end
 xy= p(:,2:3);
 gplot(A,xy,'k.-');
 hold on
 
 for i=1:92
-    text(p(i,2)+2,p(i,3)+2,num2str(i));
+    text(p(i,2)+2,p(i,3)+1,num2str(i));
 end
 
 %floyd
-for i=1:size(e,1)
-    x=e(i,1);
-    y=e(i,2);
-    A(x,y)=1;
-    A(y,x)=1;
-end
-
-adj=ones(n)*Inf;
-for i=1:n 
+adj=ones(92)*Inf;
+for i=1:92 
     adj(i,i)=0;
 end
-for i=1:n
-    for j=1:n
+for i=1:92
+    for j=1:92
         if A(i,j)==1
             p1=[p(i,2);p(i,3)];
             p2=[p(j,2);p(j,3)];
@@ -46,10 +41,9 @@ for i=1:n
     end
 end
 adjbak=adj;
-
-for k=1:n
-    for i=1:n
-        for j=1:n
+for k=1:92
+    for i=1:92
+        for j=1:92
             if adj(i,k)+adj(k,j)<adj(i,j)
                 adj(i,j)=adj(i,k)+adj(k,j);
             end
@@ -59,7 +53,7 @@ end
 
 %初始最短分配图
  Bad=zeros(92,1);
- for i=1:size(kiosk)
+ for i=1:20
      plot(p(kiosk(i),2),p(kiosk(i),3),'bo')
  end
  assign=zeros(1,92);
@@ -81,8 +75,7 @@ hold off
 
 
 %匈牙利分配
-low=0.0;
-high=max(max(adj));
+
     %20*13 警亭与节点距离矩阵
 L=zeros(20,size(entryA,1));
 for i=1:20
@@ -90,11 +83,13 @@ for i=1:20
         L(i,j)=adj(i,entryA(j));
     end
 end
+low=0.0;
+high=max(max(L));
     %二分搜索
-while high-low>0.01
+while high-low>0.001
     mid=(low+high)/2;
     Metrix=1./(L<=mid);
-    [M,Cost]=Hungarian(Metrix);
+    [at,Cost]=munkres(Metrix);
     if Cost<13
         low=mid;
     else
@@ -102,10 +97,15 @@ while high-low>0.01
     end
 end
 Metrix=1./(L<=high);
-[M,Cost]=Hungarian(Metrix);
-%M
-%Cost
-%high
+[at,Cost]=munkres(Metrix);
+at
+Cost
+high
+M=zeros(20,13);
+for i=1:20 
+    if at(i)~=0 M(i,at(i))=1; end
+end
+        
 [X,Y]=find(M==1);
 Y=entryA(Y);
 l=[X,Y];
@@ -123,7 +123,7 @@ for i=1:92
 end
 %load
 
-
+add=[1:20 28 38 47 91]
 
 
             

@@ -91,10 +91,10 @@ for i=1:20
     end
 end
     %¶þ·ÖËÑË÷
-while high-low>0.01
+while high-low>0.001
     mid=(low+high)/2;
     Metrix=1./(L<=mid);
-    [M,Cost]=Hungarian(Metrix);
+    [at,Cost]=munkres(Metrix);
     if Cost<13
         low=mid;
     else
@@ -102,10 +102,15 @@ while high-low>0.01
     end
 end
 Metrix=1./(L<=high);
-[M,Cost]=Hungarian(Metrix);
-%M
-%Cost
-%high
+[at,Cost]=munkres(Metrix);
+at
+Cost
+high
+M=zeros(20,13);
+for i=1:20 
+    if at(i)~=0 M(i,at(i))=1; end
+end
+        
 [X,Y]=find(M==1);
 Y=entryA(Y);
 l=[X,Y];

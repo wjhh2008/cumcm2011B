@@ -6,6 +6,7 @@ e=xlsread(file,2,'A2:B929');
 entryA=xlsread(file,4,'C2:C14');
 
 limit=30;
+figure(1)
 %plot graph
 A=zeros(92);
 xy=zeros(92,2);
@@ -22,7 +23,7 @@ gplot(A,xy,'k.-');
 hold on
 
 for i=1:92
-    text(p(i,2)+2,p(i,3)+2,num2str(i));
+    text(p(i,2)+2,p(i,3)+1,num2str(i));
 end
 
 %floyd
@@ -65,7 +66,7 @@ end
  end
  for i=1:92
      if Bad(i)==1
-         plot(p(i,2),p(i,3),'rx', 'MarkerSize',10,'LineWidth',2)    
+         %plot(p(i,2),p(i,3),'rx', 'MarkerSize',10,'LineWidth',2)    
      end
  end
  %assign
@@ -74,8 +75,7 @@ hold off
 
 
 %ÐÙÑÀÀû·ÖÅä
-low=0.0;
-high=max(max(adj));
+
     %20*13 ¾¯Í¤Óë½Úµã¾àÀë¾ØÕó
 L=zeros(20,size(entryA,1));
 for i=1:20
@@ -83,11 +83,13 @@ for i=1:20
         L(i,j)=adj(i,entryA(j));
     end
 end
+low=0.0;
+high=max(max(L));
     %¶þ·ÖËÑË÷
-while high-low>0.01
+while high-low>0.001
     mid=(low+high)/2;
     Metrix=1./(L<=mid);
-    [M,Cost]=Hungarian(Metrix);
+    [at,Cost]=munkres(Metrix);
     if Cost<13
         low=mid;
     else
@@ -95,10 +97,15 @@ while high-low>0.01
     end
 end
 Metrix=1./(L<=high);
-[M,Cost]=Hungarian(Metrix);
-%M
-%Cost
-%high
+[at,Cost]=munkres(Metrix);
+at
+Cost
+high
+M=zeros(20,13);
+for i=1:20 
+    if at(i)~=0 M(i,at(i))=1; end
+end
+        
 [X,Y]=find(M==1);
 Y=entryA(Y);
 l=[X,Y];
@@ -116,7 +123,11 @@ for i=1:92
 end
 %load
 
-
-
+add=[29 40 48 89];
+hold on
+for i=add
+     plot(p(i,2),p(i,3),'bo')
+end
+ hold off
 
             
